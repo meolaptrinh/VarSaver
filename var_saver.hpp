@@ -1,3 +1,6 @@
+/** 
+ * @author Nguyen Duc Minh Quan (meolaptrinh)
+*/
 #ifndef VAR_SAVER_HPP
 #define VAR_SAVER_HPP
 #include<iostream>
