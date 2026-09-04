@@ -10,7 +10,7 @@ namespace VarSaver{
     struct Var{
         std::string type;
         std::string name;
-        std::string val = "none";
+        std::string val = "";
     };
     inline Var NotVar = {"0ERR","0ERR","0ERR"};
     inline std::string notban = ":_ \t;,";
@@ -94,7 +94,6 @@ namespace VarSaver{
      * @note It is recommended to use output file extension that does not conflict with the file extensions of other software.
      */
     inline bool SaveVarToFile(std::string inp,std::string out){
-        std::vector<Var>res;
         std::ifstream cppf(inp,std::ios::binary);
         std::ofstream flout(out,std::ios::binary);
         if(!cppf.is_open() || !flout.is_open())return false;
@@ -111,7 +110,7 @@ namespace VarSaver{
             if(!s.empty() && s[s.size()-1] == '\r')s.pop_back();
             if(br == 0){
                 auto fmain = s.find("int main");
-                if(fmain != std::string::npos){
+                if(fmain != s.npos && s.find("//") == s.npos){
                     mainl = l;
                     inmain = true;
                     mainfunc.push_back(s);
@@ -143,11 +142,51 @@ namespace VarSaver{
             cm.push_back(c);
             if(c == ';'){
                 std::vector<Var>k = CommandToVar(cm);
-                for(Var vr:k)res.push_back(vr);
+                for(Var vr:k){
+                    if(vr.val == ""){
+                        flout<<"\t"<<vr.type<<" "<<vr.name<<";\n";
+                    }
+                    else flout<<"\t"<<vr.type<<" "<<vr.name<<"="<<vr.val<<";\n";
+                }
                 cm = "";
             }
         }
-        for(Var vr:res)flout<<vr.type<<" "<<vr.name<<" "<<vr.val<<"\n";
+        return true;
+    }
+    /**
+     * @brief Load variables file and extract variables to a .cpp file.
+     * @param inp variables file path.
+     * @param out C++ code file path.
+     * @return true if the variable is loaded successfully.
+     * @return false if there is an error.
+     * @warning Make sure your C++ source code is written correctly and has ONLY ONE 'main(...)' function. 
+     */
+    inline bool LoadVarToFile(std::string inp,std::string out){
+        std::ifstream varf(inp,std::ios::binary);
+        std::fstream cppf(out,std::ios::binary|std::ios::in|std::ios::out);
+        if(!varf.is_open() || !cppf.is_open())return false;
+        //read the var file 
+        std::vector<std::string>vars;
+        std::string ln;
+        while(std::getline(varf,ln))vars.push_back(ln);
+        //find the start of main function (and save code )
+        std::vector<std::string>allcpp;
+        int mainln = 0;
+        bool fmain = false;
+        while(std::getline(cppf,ln)){
+            if(ln.find("int main") != ln.npos && ln.find("//") == ln.npos)fmain = true;
+            if(!fmain)mainln++;
+            allcpp.push_back(ln);
+            if(fmain && ln.find("{") != ln.npos){
+                for(std::string& vr:vars){allcpp.push_back(vr);}
+                fmain = false;
+            }
+        }
+        cppf.clear();
+        cppf.seekp(0, std::ios::beg);
+        for(std::string cm:allcpp){
+            cppf<<cm<<"\n";
+        }
         return true;
     }
 };
