@@ -1,3 +1,7 @@
-	long long r;
-	long long b=99;
-	int f=8;
+	int a=0;
+	int b=10;
+	int c;
+	double f;
+	double r;
+	double g;
+	double h;

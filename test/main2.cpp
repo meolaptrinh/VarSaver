@@ -1,4 +1,11 @@
-#include<bits/stdc++.h>
+#include<iostream>
 int main(){
-    return 0;
+	int a=0;
+	int b=10;
+	int c;
+	double f;
+	double r;
+	double g;
+	double h;
+	return 0;
 }

@@ -67,7 +67,7 @@ namespace VarSaver{
             fxvartype.push_back(c);
         }
         if(fxvartype == "return" || fxvartype == "goto" || fxvartype == "using" || fxvartype == "delete" || fxvartype == "throw" || fxvartype == "typedef")return {};
-        for(std::string vr:vars){
+        for(std::string& vr:vars){
             std::string vrname;
             std::string vrvl;
             bool hvl = false;
@@ -134,7 +134,7 @@ namespace VarSaver{
         }
         std::string maincm;
         bool fx = false;
-        for(std::string cm:mainfunc){
+        for(std::string& cm:mainfunc){
             for(char c:cm){
                 if(c == '{'){fx = true;continue;}
                 if(fx)maincm.push_back(c);
@@ -176,18 +176,29 @@ namespace VarSaver{
         std::vector<std::string>allcpp;
         int mainln = 0;
         bool fmain = false;
+        bool oneline = false;
+        std::string mainline;
         while(std::getline(cppf,ln)){
             if(ln.find("int main") != ln.npos && ln.find("//") == ln.npos)fmain = true;
             if(!fmain)mainln++;
-            allcpp.push_back(ln);
+            allcpp.push_back(ln);          
             if(fmain && ln.find("{") != ln.npos){
+                if(ln.find("}") != ln.npos){
+                    while(allcpp.back().back() != '}')allcpp.back().pop_back();
+                    oneline = true;
+                    allcpp.back().pop_back();
+                    while(allcpp.back().back() != '{'){mainline.push_back(allcpp.back().back());allcpp.back().pop_back();}
+                }
                 for(std::string& vr:vars){allcpp.push_back(vr);}
                 fmain = false;
             }
         }
+        mainline.push_back('\t');
+        std::reverse(mainline.begin(),mainline.end());
+        if(oneline){allcpp.push_back(mainline);allcpp.push_back("}");}
         cppf.clear();
         cppf.seekp(0, std::ios::beg);
-        for(std::string cm:allcpp){
+        for(std::string& cm:allcpp){
             cppf<<cm<<"\n";
         }
         return true;
