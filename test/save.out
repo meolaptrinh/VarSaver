@@ -1,6 +1,6 @@
 	int a=0;
 	int b=10;
-	int c;
+	std::vector<int> c;
 	double f;
 	double r;
 	double g;

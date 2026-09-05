@@ -16,7 +16,7 @@ namespace VarSaver{
         std::string val = "";
     };
     inline Var NotVar = {"0ERR","0ERR","0ERR"};
-    inline std::string notban = ":_ \t;,";
+    inline std::string notban = ":_ \t;,<>";
     /**
      * @brief Parses a line of C++ code and extracts variable declarations.
      * @param s The C++ code line
